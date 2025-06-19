@@ -1,0 +1,35 @@
+# Lista de tareas para la applicacion #
+
++---------------------------------------------------------+
+| Posibles estados: no_iniciada | en_proceso | completada |
++---------------------------------------------------------+
+
+> Diseñar el metodo de proteccion de los datos ADS-B
+Estado : en_proceso (pendiente de confirmar viabilidad)
+Descripcion : ver detalles en README.md
+
+> Verificar el TC para mensajes de identificacion
+Estado : no_iniciada
+Descripcion : actualmente se ha selccionado TC = 0. Pendiente determinar si esto
+es valido o si significaria errores en otros mensajes.
+
+> Diseñar la logica para la verificacion
+Estado : completada
+Descripcion : ver detalles en el diagrama adsb-rx.drawio
+
+> Implementar la verificacion en python
+Estado : completada
+Descripcion : implementado en adsb_receiver.py
+
+> Implementar algoritmo para calcular el Hash
+Estado : no_iniciada
+
+> Implementar el algoritmo para cifrar/descifrar el Hash usando certificados
+Estado : no_iniciada
+
+> Implementar un cliente que envie mensajes a partir de un archivo de datos
+> crudos. Cada client envia solo un ICAO ID  para simular fuentes individuales
+Estado : no_iniciada
+
+> Añadir el generador de mensajes adsb en adsb-decoder.xlsx
+Estado : no_iniciada
