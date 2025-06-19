@@ -22,6 +22,7 @@ HOST = '0.0.0.0'
 PORT = 30002
 
 trusted_senders = []
+untrusted_senders = []
 
 """
 Codigo seleccionado para nuevo mensaje de identificacion
@@ -29,6 +30,28 @@ Se selecciono 0 porque no tiene asignacion
 Ref: https://mode-s.org/1090mhz/content/ads-b/1-basics.html
 """
 ID_TYPE_CODE = 0
+
+"""
+retura el hash descifrado
+msg_hash: un mensaje de 56-bit encriptado
+"""
+def decrypt_hash(msg_hash):
+    #TODO: por ahora solo retorne el mismo hash
+    #TODO: pendiente implementar descifrado usando un certificado
+    return msg_hash
+
+"""
+calcula el hash a partir de los mensajes en el bufer
+buff_msg: un bufer con mensajes de 56 bits
+"""
+def calculate_hash(buff_msg):
+    #TODO: por ahora solo se hace un XOR a todos los mensajes
+    #TODO: pendiente implementar el algoritmo de hash
+    aux = 0xFFFFFFFFFF # valor semilla, 56 bits en 1
+    for msg in buff_msg:
+        aux ^= msg
+    return aux
+        
 
 def handle_client(conn, addr):
     print(f"Conectado: {addr}")
@@ -57,21 +80,29 @@ def handle_client(conn, addr):
             if first_id_rx:
                 if type_code == ID_TYPE_CODE:
                     
-                    # decrypt hash from adsb_raw_msg
+                    # descrifrar el hash desde adsb_raw_msg
                     rx_hash = 123
-                    # calculate hash from buffer
-                    calc_hash = 123
+                    # calcular el hash a partir de los datos en el bufer
+                    calc_hash = calculate_hash(msg_buffer)
+                    print("calc_hash: " + str(calc_hash))
                     
                     # limpiar el buffer
                     msg_buffer.clear()
                     
                     if rx_hash == calc_hash:
+                        print("trusted sender")
                         if sender not in trusted_senders:
                             trusted_senders.append(sender)
+                        if sender in untrusted_senders:
+                            untrusted_senders.remove(sender)
                     else:
+                        print("untrusted sender")
                         if sender in trusted_senders:
                             trusted_senders.remove(sender)
+                        if sender not in untrusted_senders:
+                            untrusted_senders.append(sender)
                     print("trusted_senders: " + str(trusted_senders))
+                    print("untrusted_senders: " + str(untrusted_senders))
                     
                 else:
                     msg_buffer.append(adsb_raw_msg)
