@@ -21,11 +21,11 @@ Descripcion : ver detalles en el diagrama adsb-rx.drawio
 Estado : completada
 Descripcion : implementado en adsb_receiver.py
 
-> Implementar algoritmo para calcular el Hash
+> Implementar algoritmo para calcular CRC32
 Estado : no_iniciada
 
-> Implementar el algoritmo para cifrar/descifrar el Hash usando certificados
-Estado : no_iniciada
+> Implementar el algoritmo para cifrar/descifrar usando CHACHA20
+Estado : en_proceso
 
 > Implementar un cliente que envie mensajes a partir de un archivo de datos
 > crudos. Cada client envia solo un ICAO ID  para simular fuentes individuales
@@ -33,3 +33,8 @@ Estado : no_iniciada
 
 > Añadir el generador de mensajes adsb en adsb-decoder.xlsx
 Estado : no_iniciada
+
+> Actualizar el codigo y el diagrama de flujo a la propuesta que usa CHACHA20 y
+> CRC32
+Estado : en_proceso
+Descripcion :

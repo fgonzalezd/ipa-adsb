@@ -32,24 +32,23 @@ Ref: https://mode-s.org/1090mhz/content/ads-b/1-basics.html
 ID_TYPE_CODE = 0
 
 """
-retura el hash descifrado
-msg_hash: un mensaje de 56-bit encriptado
+cifra los datos usando chacha20
+data: bloque de 512 bits
 """
-def decrypt_hash(msg_hash):
-    #TODO: por ahora solo retorne el mismo hash
-    #TODO: pendiente implementar descifrado usando un certificado
-    return msg_hash
+def calculate_chacha20(data):
+    #TODO: pendiente implementar descifrado usando chacha20
+    aux = ""
+    for m in data:
+        aux += m
+    return msg_chacha20
 
 """
-calcula el hash a partir de los mensajes en el bufer
-buff_msg: un bufer con mensajes de 56 bits
+calcula el crc32 a partir de los mensajes cifrados
+msg: mensaje de 512 bits obtenido de cifrar los datos almacenados en el buffer
 """
-def calculate_hash(buff_msg):
-    #TODO: por ahora solo se hace un XOR a todos los mensajes
-    #TODO: pendiente implementar el algoritmo de hash
-    aux = 0xFFFFFFFFFF # valor semilla, 56 bits en 1
-    for msg in buff_msg:
-        aux ^= msg
+def calculate_crc32(msg):
+    #TODO: pendiente implementar el algoritmo de crc32
+    aux = 0xFFFFFFFF
     return aux
         
 
@@ -76,37 +75,53 @@ def handle_client(conn, addr):
             print("type code : "+str(type_code))
             print("sender    : "+sender)
             
-            
+            # Si ya se recibio el primer mensaje de identificacion, se inicia
+            # el proceso de validacion
             if first_id_rx:
+                
+                # el mensaje actual es de identificacion
                 if type_code == ID_TYPE_CODE:
                     
-                    # descrifrar el hash desde adsb_raw_msg
-                    rx_hash = 123
-                    # calcular el hash a partir de los datos en el bufer
-                    calc_hash = calculate_hash(msg_buffer)
-                    print("calc_hash: " + str(calc_hash))
+                    # cifrar los ultimos 4 mensajes del buffer
+                    calc_chacha20 = calculate_chacha20(msg_buffer[-4:])
+                    
+                    # calcular el crc32 a partir de los datos cifrados
+                    calc_crc32 = calculate_crc32(calc_chacha20)
+                    print("calc_crc32: " + str(calc_crc32))
                     
                     # limpiar el buffer
                     msg_buffer.clear()
                     
-                    if rx_hash == calc_hash:
+                    # crc32 recibido en el mensaje de identificacion
+                    rx_crc32 = pms.data(msg)
+                    
+                    # el CRC calculado es igual al recibido
+                    if rx_crc32 == calc_crc32:
                         print("trusted sender")
+                        # agrega el transmisor a la lista de confiables
                         if sender not in trusted_senders:
                             trusted_senders.append(sender)
+                        # elimina el transmisor de la lista de no confiables
                         if sender in untrusted_senders:
                             untrusted_senders.remove(sender)
                     else:
                         print("untrusted sender")
+                        # elimina el transmisor de la lista de confiables
                         if sender in trusted_senders:
                             trusted_senders.remove(sender)
+                        # agrega el transmisor a la lista de no confiables
                         if sender not in untrusted_senders:
                             untrusted_senders.append(sender)
                     print("trusted_senders: " + str(trusted_senders))
                     print("untrusted_senders: " + str(untrusted_senders))
                     
+                # Si no es mensaje de identificacion, guarde el mensaje en el
+                # buffer temporal
                 else:
                     msg_buffer.append(adsb_raw_msg)
                     print("msg_buffer: " + str(msg_buffer))
+            
+            # Se verifica si el mensaje actual es de identificacion
             else:
                 if type_code == ID_TYPE_CODE:
                     first_id_rx = True

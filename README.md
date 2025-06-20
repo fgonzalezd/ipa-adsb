@@ -37,6 +37,9 @@ En esta seccion se detalla el principio de funcionamiento del sistema de validac
 * Compara la huella calculada con la huella recibida en el mensaje de identificacion
 	* Si las huellas son iguales, agrega el ID del transmisor a una lista de confianza
 	* Si las huellas son diferentes, elimina el ID del transmisor de la lista de confianza
+	
+## Mensaje de identificacion
+TBD
 
 ## Notas
 1. Un receptor tipico puede ver hasta 100 aviones simultaneamente en zonas de<br>
