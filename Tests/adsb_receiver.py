@@ -11,18 +11,25 @@ Autor               :   Fernando Gonzalez
 
 Fecha               :   18-Junio-2025
 
-Ultima modificacion :   18-Junio-2025
+Ultima modificacion :   20-Junio-2025
 """
 
 import socket
 import threading
 import pyModeS as pms
+import chacha20 as cc20
+import os
 
 HOST = '0.0.0.0'
 PORT = 30002
 
 trusted_senders = []
 untrusted_senders = []
+
+""" Llave y nonce para encriptacion con chacha20 """
+#TODO: la llave y el nonce se deben cargar de un archivo
+key = os.urandom(32)        # 256-bit key
+nonce = os.urandom(16)      # 128-bit nonce (cryptography usa 16 bytes, no 12)
 
 """
 Codigo seleccionado para nuevo mensaje de identificacion
@@ -36,11 +43,10 @@ cifra los datos usando chacha20
 data: bloque de 512 bits
 """
 def calculate_chacha20(data):
-    #TODO: pendiente implementar descifrado usando chacha20
     aux = ""
     for m in data:
         aux += m
-    return msg_chacha20
+    return cc20.chacha20_encrypt(key, nonce, aux.encode())
 
 """
 calcula el crc32 a partir de los mensajes cifrados
@@ -93,7 +99,7 @@ def handle_client(conn, addr):
                     msg_buffer.clear()
                     
                     # crc32 recibido en el mensaje de identificacion
-                    rx_crc32 = pms.data(msg)
+                    rx_crc32 = pms.data(adsb_raw_msg)
                     
                     # el CRC calculado es igual al recibido
                     if rx_crc32 == calc_crc32:

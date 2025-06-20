@@ -57,3 +57,10 @@ TBD
 
 ## Posibles mejoras
 TBD
+
+## Referencias
+Los siguientes materiales se usaron para producir esta aplicacion
+* [<u>Python cryptography</u>](https://pypi.org/project/cryptography/)
+* [<u>Python pyModeS</u>](https://pypi.org/project/pyModeS/)
+* [<u>Opensky Data Samples</u>](https://opensky-network.org/datasets/)
+* [<u>The 1090 Megahertz Riddle</u>](https://mode-s.org/1090mhz/)
