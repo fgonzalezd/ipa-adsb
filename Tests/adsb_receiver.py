@@ -11,7 +11,7 @@ Autor               :   Fernando Gonzalez
 
 Fecha               :   18-Junio-2025
 
-Ultima modificacion :   20-Junio-2025
+Ultima modificacion :   21-Junio-2025
 """
 
 import socket
@@ -19,6 +19,7 @@ import threading
 import pyModeS as pms
 import chacha20 as cc20
 import os
+import zlib
 
 HOST = '0.0.0.0'
 PORT = 30002
@@ -38,31 +39,35 @@ Ref: https://mode-s.org/1090mhz/content/ads-b/1-basics.html
 """
 ID_TYPE_CODE = 0
 
+""" Cantidad de mensajes usados para la validacion """
+MAX_MSG = 10
+
 """
 cifra los datos usando chacha20
-data: bloque de 512 bits
+data: lista que contiene los mensajes a cifrar
 """
 def calculate_chacha20(data):
     aux = ""
+    
     for m in data:
         aux += m
+        
     return cc20.chacha20_encrypt(key, nonce, aux.encode())
 
 """
 calcula el crc32 a partir de los mensajes cifrados
-msg: mensaje de 512 bits obtenido de cifrar los datos almacenados en el buffer
+msg: mensaje obtenido de cifrar los datos almacenados en el buffer
 """
 def calculate_crc32(msg):
-    #TODO: pendiente implementar el algoritmo de crc32
-    aux = 0xFFFFFFFF
-    return aux
+    cksum = zlib.crc32(msg.encode())
+    return cksum
         
 
 def handle_client(conn, addr):
     print(f"Conectado: {addr}")
     
-    first_id_rx = False
-    msg_buffer = []
+    first_id_rx = False # bandera de inicio
+    msg_buffer = [] # buffer temporal
     
     with conn:
         while True:
@@ -88,8 +93,8 @@ def handle_client(conn, addr):
                 # el mensaje actual es de identificacion
                 if type_code == ID_TYPE_CODE:
                     
-                    # cifrar los ultimos 4 mensajes del buffer
-                    calc_chacha20 = calculate_chacha20(msg_buffer[-4:])
+                    # cifrar los mensajes del buffer
+                    calc_chacha20 = calculate_chacha20(msg_buffer)
                     
                     # calcular el crc32 a partir de los datos cifrados
                     calc_crc32 = calculate_crc32(calc_chacha20)
@@ -97,6 +102,7 @@ def handle_client(conn, addr):
                     
                     # limpiar el buffer
                     msg_buffer.clear()
+                    
                     
                     # crc32 recibido en el mensaje de identificacion
                     rx_crc32 = pms.data(adsb_raw_msg)
@@ -123,12 +129,13 @@ def handle_client(conn, addr):
                     
                 # Si no es mensaje de identificacion, guarde el mensaje en el
                 # buffer temporal
-                else:
+                else if len(msg_buffer) <= MAX_MSG:
                     msg_buffer.append(adsb_raw_msg)
                     print("msg_buffer: " + str(msg_buffer))
             
-            # Se verifica si el mensaje actual es de identificacion
+            # Aun no se ha recibido el primer mensaje de identificacion
             else:
+                # Se verifica si el mensaje actual es de identificacion
                 if type_code == ID_TYPE_CODE:
                     first_id_rx = True
                     print("first_id_rx: " + str(first_id_rx))

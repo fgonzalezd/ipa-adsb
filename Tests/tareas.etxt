@@ -4,6 +4,12 @@
 | Posibles estados: no_iniciada | en_proceso | completada |
 +---------------------------------------------------------+
 
+> Definir si es necesario que sean 4 mensajes para CHACHA20
+Estado : no_iniciada
+Descripcion : puede que no sea necesario usar bloques de 512 bits. El algoritmo
+maneja cualquier dato que se le pase. Se podria definir un numero mayor de
+mensajes, que sean mas datos los que se usan y asi es mas representativo.
+
 > Crear bases de datos para pruebas
 Estado : no_iniciada
 Descripcion : Crear bases de datos para verificar la efectividad del algoritmo.
@@ -19,9 +25,6 @@ Estado : no_iniciada
 Descripcion : actualmente se ha selccionado TC = 0. Pendiente determinar si esto
 es valido o si significaria errores en otros mensajes.
 
-> Implementar algoritmo para calcular CRC32
-Estado : no_iniciada
-
 > Implementar un cliente que envie mensajes a partir de un archivo de datos
 > crudos. Cada client envia solo un ICAO ID  para simular fuentes individuales
 Estado : no_iniciada
@@ -32,6 +35,10 @@ Estado : no_iniciada
 > Diseñar el metodo de proteccion de los datos ADS-B
 Estado : en_proceso (pendiente de confirmar viabilidad)
 Descripcion : ver detalles en README.md
+
+> Implementar algoritmo para calcular CRC32
+Estado : completada
+Descripcion : se utiliza la libreria zlib
 
 > Implementar la verificacion en python
 Estado : completada
