@@ -55,7 +55,7 @@ TBD
 TBD
 
 ## Posibles mejoras
-TBD
+1. El nonce deberia cambiar en cada sesion. Se podria incluir como parte del mensaje de identificacion
 
 ## Referencias
 Los siguientes materiales se usaron para producir esta aplicacion
