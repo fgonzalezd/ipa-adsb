@@ -21,6 +21,7 @@ import chacha20 as cc20
 import os
 import zlib
 import credentials
+import time
 
 HOST = '0.0.0.0'
 PORT = 30002
@@ -68,6 +69,11 @@ def handle_client(conn, addr):
     
     first_id_rx = False # bandera de inicio
     msg_buffer = [] # buffer temporal
+    msg_counter = 0
+    trusted = False
+    
+    with open('receiver_log.txt', 'w') as l:
+        l.write("msg\tsender\ttrusted\n")
     
     with conn:
         while True:
@@ -80,6 +86,8 @@ def handle_client(conn, addr):
             adsb_raw_msg = data.decode()            
             type_code = pms.adsb.typecode(adsb_raw_msg)
             sender = pms.adsb.icao(adsb_raw_msg)
+            
+            msg_counter += 1
             
             print("----------------")
             print("raw       : "+adsb_raw_msg)
@@ -111,28 +119,40 @@ def handle_client(conn, addr):
                     # el CRC calculado es igual al recibido
                     if rx_crc32 == calc_crc32:
                         print("trusted sender")
+                        trusted = True
                         # agrega el transmisor a la lista de confiables
                         if sender not in trusted_senders:
                             trusted_senders.append(sender)
                         # elimina el transmisor de la lista de no confiables
                         if sender in untrusted_senders:
                             untrusted_senders.remove(sender)
+                        
                     else:
                         print("untrusted sender")
+                        trusted = False
                         # elimina el transmisor de la lista de confiables
                         if sender in trusted_senders:
                             trusted_senders.remove(sender)
                         # agrega el transmisor a la lista de no confiables
                         if sender not in untrusted_senders:
                             untrusted_senders.append(sender)
+                            
                     print("trusted_senders: " + str(trusted_senders))
                     print("untrusted_senders: " + str(untrusted_senders))
                     
                 # Si no es mensaje de identificacion, guarde el mensaje en el
                 # buffer temporal
-                elif len(msg_buffer) <= MAX_MSG:
+                elif len(msg_buffer) < MAX_MSG:
                     msg_buffer.append(adsb_raw_msg)
                     print("msg_buffer: " + str(msg_buffer))
+                    
+                # Si llegamos aqui no se ha recibido ID despues de 10 mensajes
+                # El sender ya no es confiable
+                elif len(msg_buffer) == MAX_MSG:
+                    trusted = False
+                    # elimina el transmisor de la lista de confiables
+                    if sender in trusted_senders:
+                        trusted_senders.remove(sender)
             
             # Aun no se ha recibido el primer mensaje de identificacion
             else:
@@ -140,6 +160,11 @@ def handle_client(conn, addr):
                 if type_code == ID_TYPE_CODE:
                     first_id_rx = True
                     print("first_id_rx: " + str(first_id_rx))
+                    
+            with open('receiver_log.txt', 'a') as l:
+                l.write(str(msg_counter) + "\t" + sender + "\t" + str(trusted) + "\n")
+            
+
             
             print("----------------")    
 
