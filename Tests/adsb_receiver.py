@@ -20,6 +20,7 @@ import pyModeS as pms
 import chacha20 as cc20
 import os
 import zlib
+import credentials
 
 HOST = '0.0.0.0'
 PORT = 30002
@@ -28,9 +29,8 @@ trusted_senders = []
 untrusted_senders = []
 
 """ Llave y nonce para encriptacion con chacha20 """
-#TODO: la llave y el nonce se deben cargar de un archivo
-key = os.urandom(32)        # 256-bit key
-nonce = os.urandom(16)      # 128-bit nonce (cryptography usa 16 bytes, no 12)
+key = credentials.key       # 256-bit key
+nonce = credentials.nonce   # 128-bit nonce (cryptography usa 16 bytes, no 12)
 
 """
 Codigo seleccionado para nuevo mensaje de identificacion
@@ -59,7 +59,7 @@ calcula el crc32 a partir de los mensajes cifrados
 msg: mensaje obtenido de cifrar los datos almacenados en el buffer
 """
 def calculate_crc32(msg):
-    cksum = zlib.crc32(msg.encode())
+    cksum = zlib.crc32(msg)
     return cksum
         
 
@@ -105,7 +105,8 @@ def handle_client(conn, addr):
                     
                     
                     # crc32 recibido en el mensaje de identificacion
-                    rx_crc32 = pms.data(adsb_raw_msg)
+                    rx_crc32 = int(pms.data(adsb_raw_msg)[6:], 16)
+                    print("rx_crc32: " + str(rx_crc32))
                     
                     # el CRC calculado es igual al recibido
                     if rx_crc32 == calc_crc32:
@@ -129,7 +130,7 @@ def handle_client(conn, addr):
                     
                 # Si no es mensaje de identificacion, guarde el mensaje en el
                 # buffer temporal
-                else if len(msg_buffer) <= MAX_MSG:
+                elif len(msg_buffer) <= MAX_MSG:
                     msg_buffer.append(adsb_raw_msg)
                     print("msg_buffer: " + str(msg_buffer))
             
