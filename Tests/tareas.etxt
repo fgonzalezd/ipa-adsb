@@ -4,6 +4,12 @@
 | Posibles estados: no_iniciada | en_proceso | completada |
 +---------------------------------------------------------+
 
+> Describir el proceso de como se obtienen los mensajes para las pruebas
+Estado : no_iniciada
+Descripcion : incluir en el documento los detalles de como obtener los archivos
+para pruebas, desde el avro obtenido de Opensky, los scripts de procesamiento
+y el archivo final
+
 > Definir si es necesario que sean 4 mensajes para CHACHA20
 Estado : no_iniciada
 Descripcion : puede que no sea necesario usar bloques de 512 bits. El algoritmo
