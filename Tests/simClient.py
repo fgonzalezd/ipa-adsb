@@ -7,14 +7,11 @@ import credentials
 import zlib
 import chacha20 as cc20
 import random
+from concurrent.futures import ThreadPoolExecutor
 
 HOST = '127.0.0.1'  # Dirección del servidor (localhost)
 PORT = 30002        # Puerto del servidor
-
-#scr_file = 'raw_messages_4008f9.txt'
-#scr_file = 'raw_messages.txt'
-#id_enabled = True
-MAX_MSG = 10
+MAX_MSG = 10        # Cantidad de mensajes en el buffer
 
 def create_id_msg(msg):
     aux = ""
@@ -78,7 +75,18 @@ def connect_client(scr_file):
 
 if __name__ == '__main__':
     
-    if len(sys.argv) != 2:
+    """if len(sys.argv) != 2:
         print("Usage: simClient.py <file>")
     else:
         connect_client(sys.argv[1])
+    """
+    params = [
+        "raw_messages_4008f9.txt", 
+        "raw_messages_3c646b.txt",
+        "raw_messages_4b7fab.txt",
+        "raw_messages_4ca8af.txt",
+        "raw_messages_406a9a.txt"
+    ]
+    
+    with ThreadPoolExecutor() as executor:
+        list(executor.map(connect_client, params))
