@@ -159,8 +159,6 @@ def handle_client(conn, addr):
                 # El sender ya no es confiable
                 elif len(msg_buffer) == MAX_MSG:
                     trusted = False
-                    
-                    msg_buffer.clear()
                         
                     with open('receiver_log.txt', 'a') as l:
                         l.write("not trusted\t" + sender + "\t" + str(int(time.time() * 1000)) + "\n")
