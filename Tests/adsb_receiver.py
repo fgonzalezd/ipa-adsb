@@ -69,11 +69,10 @@ def handle_client(conn, addr):
     
     first_id_rx = False # bandera de inicio
     msg_buffer = [] # buffer temporal
-    msg_counter = 0
     trusted = False
     
     with open('receiver_log.txt', 'w') as l:
-        l.write("msg\tsender\ttrusted\n")
+        l.write("msg\tsender\tTS\n")
     
     with conn:
         while True:
@@ -87,7 +86,9 @@ def handle_client(conn, addr):
             type_code = pms.adsb.typecode(adsb_raw_msg)
             sender = pms.adsb.icao(adsb_raw_msg)
             
-            msg_counter += 1
+            with open('receiver_log.txt', 'a') as l:
+                l.write(str(adsb_raw_msg) + "\t" + sender + "\t" + str(int(time.time() * 1000)) + "\n")
+            
             
             print("----------------")
             print("raw       : "+adsb_raw_msg)
@@ -120,6 +121,10 @@ def handle_client(conn, addr):
                     if rx_crc32 == calc_crc32:
                         print("trusted sender")
                         trusted = True
+                        
+                        with open('receiver_log.txt', 'a') as l:
+                            l.write("trusted\t" + sender + "\t" + str(int(time.time() * 1000)) + "\n")
+                            
                         # agrega el transmisor a la lista de confiables
                         if sender not in trusted_senders:
                             trusted_senders.append(sender)
@@ -130,6 +135,10 @@ def handle_client(conn, addr):
                     else:
                         print("untrusted sender")
                         trusted = False
+                        
+                        with open('receiver_log.txt', 'a') as l:
+                            l.write("not trusted\t" + sender + "\t" + str(int(time.time() * 1000)) + "\n")
+                            
                         # elimina el transmisor de la lista de confiables
                         if sender in trusted_senders:
                             trusted_senders.remove(sender)
@@ -150,6 +159,12 @@ def handle_client(conn, addr):
                 # El sender ya no es confiable
                 elif len(msg_buffer) == MAX_MSG:
                     trusted = False
+                    
+                    msg_buffer.clear()
+                        
+                    with open('receiver_log.txt', 'a') as l:
+                        l.write("not trusted\t" + sender + "\t" + str(int(time.time() * 1000)) + "\n")
+                            
                     # elimina el transmisor de la lista de confiables
                     if sender in trusted_senders:
                         trusted_senders.remove(sender)
@@ -160,12 +175,7 @@ def handle_client(conn, addr):
                 if type_code == ID_TYPE_CODE:
                     first_id_rx = True
                     print("first_id_rx: " + str(first_id_rx))
-                    
-            with open('receiver_log.txt', 'a') as l:
-                l.write(str(msg_counter) + "\t" + sender + "\t" + str(trusted) + "\n")
-            
 
-            
             print("----------------")    
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

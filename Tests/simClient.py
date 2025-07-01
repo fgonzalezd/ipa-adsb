@@ -36,49 +36,42 @@ def connect_client(scr_file):
         client_socket.connect((HOST, PORT))
         print("Conectado al servidor")
         
-        msg_buffer_counter = 0
         msg_buffer = []
         id_enabled = False
         msg_counter = random.randint(20, 100)
-        i = 0
         
         with open('client_log.txt', 'w') as l:
-            l.write("msg\tid_enabled\n")
+            l.write("msg\tTS\n")
 
         with open(scr_file, 'r') as f:
             for line in f:
                 msg = line.strip()
 
                 client_socket.sendall(msg.encode())
+                
+                with open('client_log.txt', 'a') as l:
+                    l.write(str(msg) + "\t" + str(int(time.time() * 1000)) + "\n")
+                    
                 time.sleep(0.2)
                 
-                i += 1
-                with open('client_log.txt', 'a') as l:
-                    l.write(str(i) + "\t" + str(id_enabled) + "\n")
-                
-                if msg_buffer_counter < MAX_MSG:
+                if len(msg_buffer) < MAX_MSG:
                     msg_buffer.append(msg)
-                    msg_buffer_counter += 1
                 
-                if msg_buffer_counter == MAX_MSG:
+                if len(msg_buffer) == MAX_MSG:
                     
                     if id_enabled:
                         id_msg = create_id_msg(msg_buffer)
                         client_socket.sendall(id_msg.encode())
-                        time.sleep(0.2)
                         
-                        i += 1
                         with open('client_log.txt', 'a') as l:
-                            l.write(str(i) + "\t" + str(id_enabled) + "\n")
+                            l.write(str(id_msg) + "\t" + str(int(time.time() * 1000)) + "\n")
+                            
+                        time.sleep(0.2)
                     
-                    msg_buffer_counter = 0
                     msg_buffer.clear()
-                
-
                 
                 msg_counter -= 1
                 if msg_counter == 0:
-                    msg_buffer_counter = 0
                     msg_buffer.clear()
                     id_enabled = not id_enabled
                     msg_counter = random.randint(20, 100)
