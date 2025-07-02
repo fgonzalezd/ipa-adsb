@@ -4,43 +4,48 @@
 | Posibles estados: no_iniciada | en_proceso | completada |
 +---------------------------------------------------------+
 
-> Describir el proceso de como se obtienen los mensajes para las pruebas
-Estado : no_iniciada
-Descripcion : incluir en el documento los detalles de como obtener los archivos
-para pruebas, desde el avro obtenido de Opensky, los scripts de procesamiento
-y el archivo final
-
-> Definir si es necesario que sean 4 mensajes para CHACHA20
-Estado : no_iniciada
-Descripcion : puede que no sea necesario usar bloques de 512 bits. El algoritmo
-maneja cualquier dato que se le pase. Se podria definir un numero mayor de
-mensajes, que sean mas datos los que se usan y asi es mas representativo.
-
-> Crear bases de datos para pruebas
-Estado : no_iniciada
-Descripcion : Crear bases de datos para verificar la efectividad del algoritmo.
-Crear una con mensajes de identificacion cada 4 mensajes validos
-Otra con al menos un mensaje invalido
-
-> Cargar la llave y el nonce desde un archivo
-Estado : no_iniciada
-Descripcion :
 
 > Verificar el TC para mensajes de identificacion
 Estado : no_iniciada
 Descripcion : actualmente se ha selccionado TC = 0. Pendiente determinar si esto
 es valido o si significaria errores en otros mensajes.
 
-> Implementar un cliente que envie mensajes a partir de un archivo de datos
-> crudos. Cada client envia solo un ICAO ID  para simular fuentes individuales
-Estado : no_iniciada
-
 > Añadir el generador de mensajes adsb en adsb-decoder.xlsx
 Estado : no_iniciada
 
+> Definir si es necesario que sean 4 mensajes para CHACHA20
+Estado : completada
+Descripcion : puede que no sea necesario usar bloques de 512 bits. El algoritmo
+maneja cualquier dato que se le pase. Se podria definir un numero mayor de
+mensajes, que sean mas datos los que se usan y asi es mas representativo.
+No es necesario. Actualmente se estan usando 10 mensajes
+
+> Crear bases de datos para pruebas
+Estado : completada
+Descripcion : Crear bases de datos para verificar la efectividad del algoritmo.
+Crear una con mensajes de identificacion cada 4 mensajes validos
+Otra con al menos un mensaje invalido.
+Se implemento con la habilitacion y deshabilitacion aleatoria del mensaje de
+identificacion en simClient.py
+
+> Cargar la llave y el nonce desde un archivo
+Estado : completada
+Descripcion : el nonce y la llave provienen de credentials.py
+
+> Implementar un cliente que envie mensajes a partir de un archivo de datos
+> crudos. Cada client envia solo un ICAO ID  para simular fuentes individuales
+Estado : completada
+Descripcion : implementado en simClient.py
+
 > Diseñar el metodo de proteccion de los datos ADS-B
-Estado : en_proceso (pendiente de confirmar viabilidad)
+Estado : completada (pendiente de confirmar viabilidad)
 Descripcion : ver detalles en README.md
+
+> Describir el proceso de como se obtienen los mensajes para las pruebas
+Estado : completada
+Descripcion : incluir en el documento los detalles de como obtener los archivos
+para pruebas, desde el avro obtenido de Opensky, los scripts de procesamiento
+y el archivo final
 
 > Implementar algoritmo para calcular CRC32
 Estado : completada
